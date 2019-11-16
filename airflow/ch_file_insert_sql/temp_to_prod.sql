@@ -1,0 +1,25 @@
+INSERT INTO default.event_data 
+    SELECT 
+        toDate(ts / 1000) as dt,
+        toDateTime(ts / 1000) as time,
+        ts,
+        toUInt32OrZero(userId) as userId,
+        sessionId,
+        page,
+        auth,
+        method,
+        status,
+        level,
+        itemInSession,
+        location,
+        userAgent,
+        lastName,
+        firstName,
+        registration,
+        toDate(registration / 1000) as registrationDate,
+        toDateTime(registration / 1000) as registrationTime,
+        gender,
+        artist,
+        song,
+        length
+    FROM raw.event_data_{date}

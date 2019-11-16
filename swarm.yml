@@ -1,0 +1,82 @@
+version: "3.7"
+
+services:
+  uchich:
+    image: yandex/clickhouse-server:19.14.7.15
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.uch.loadbalancer.server.port=8123
+        - traefik.http.routers.uch.rule=Host(`uchi-ch.kkmagician.com`)
+        - traefik.http.routers.uch.entrypoints=websecure
+        - traefik.http.routers.uch.tls=true
+        - traefik.http.routers.uch.tls.certresolver=leresolver
+    networks:
+      - traefik
+    volumes:
+      - type: volume
+        source: uchi_raw
+        target: /var/lib/clickhouse/data/raw
+      - type: volume
+        source: uchi_default
+        target: /var/lib/clickhouse
+    configs:
+      - source: uchi_ch
+        target: /etc/clickhouse-server/users.xml
+        
+  uchiaf:
+    image: puckel/docker-airflow
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+      restart_policy:
+        condition: on-failure
+      labels:
+        - traefik.enable=true
+        - traefik.http.services.uaf.loadbalancer.server.port=8080
+        - traefik.http.routers.uaf.rule=Host(`uchi-af.kkmagician.com`)
+        - traefik.http.routers.uaf.entrypoints=websecure
+        - traefik.http.routers.uaf.tls=true
+        - traefik.http.routers.uaf.tls.certresolver=leresolver
+
+        - traefik.http.routers.uaf.middlewares=uchi_af_auth
+    networks:
+      - traefik
+    volumes:
+      - type: volume
+        source: uchi_af
+        target: /usr/local/airflow
+      - type: volume
+        source: uchi_raw
+        target: /usr/local/ch
+    secrets:
+      - UCHI_CH_USER
+      - UCHI_CH_PASS
+
+networks:
+  traefik:
+    external: true
+
+volumes:
+  uchi_default:
+    external: true
+  uchi_raw:
+    external: true
+  uchi_af:
+    external: true
+  
+configs:
+  uchi_ch:
+    external: true
+    
+secrets:
+  UCHI_CH_USER:
+    external: true
+  UCHI_CH_PASS:
+    external: true
