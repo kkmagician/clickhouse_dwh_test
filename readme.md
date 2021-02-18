@@ -1,5 +1,5 @@
 ## О сервере
-Clickhouse и Airflow размещены на моем Docker Swarm кластере в отдельном стеке, оба на отдельной машине, где ничего больше нет. Доступ к сервисам через https://uchi-af.kkmagician.com для Airflow и https://uchi-ch.kkmagician.com для Clickhouse. Для скриптов Airflow используются Docker Secrets, чтобы не палить пароли в гите.
+Clickhouse и Airflow размещены на моем Docker Swarm кластере в отдельном стеке, оба на отдельной машине, где ничего больше нет. Доступ к сервисам через https://uchi-af.kkmagician.com для Airflow и https://uchi-ch.kkmagician.com для Clickhouse (upd: доступ закрыт). Для скриптов Airflow используются Docker Secrets, чтобы не палить пароли в гите.
 Оба сервиса сидят за reverse proxy Traefik кластера. Для Airlow стоит basic auth, для Clickhouse созданы два юзера: мой и юзер проверяющего, права одинаковые. Вся активность записывается :)
 Если интересно, настройка стека для кластера лежит в swarm.yml.
 
